@@ -22,7 +22,6 @@
 #include "gpu/Gpu.h"
 
 namespace tgfx {
-
 std::shared_ptr<PixelBuffer> HardwareBuffer::MakeFrom(AHardwareBuffer* hardwareBuffer) {
   if (!hardwareBuffer || !HardwareBufferInterface::Available()) {
     return nullptr;
@@ -31,15 +30,19 @@ std::shared_ptr<PixelBuffer> HardwareBuffer::MakeFrom(AHardwareBuffer* hardwareB
 }
 
 std::shared_ptr<PixelBuffer> HardwareBuffer::Make(int width, int height, bool alphaOnly) {
-  if (alphaOnly || !HardwareBufferInterface::Available()) {
+  if (!HardwareBufferInterface::Available()) {
     return nullptr;
   }
+  if (alphaOnly && !HardwareBufferInterface::HasR8Format()) {
+    return nullptr;
+  }
+  auto format = alphaOnly ? HARDWAREBUFFER_FORMAT_R8_UNORM : AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM;
   AHardwareBuffer* buffer = nullptr;
   AHardwareBuffer_Desc desc = {
       static_cast<uint32_t>(width),
       static_cast<uint32_t>(height),
       1,
-      AHARDWAREBUFFER_FORMAT_R8G8B8A8_UNORM,
+      format,
       AHARDWAREBUFFER_USAGE_CPU_READ_OFTEN | AHARDWAREBUFFER_USAGE_CPU_WRITE_OFTEN |
           AHARDWAREBUFFER_USAGE_GPU_SAMPLED_IMAGE | AHARDWAREBUFFER_USAGE_GPU_COLOR_OUTPUT,
       0,

@@ -74,10 +74,12 @@ std::shared_ptr<EGLHardwareTexture> EGLHardwareTexture::MakeFrom(Context* contex
   if (eglImage == EGL_NO_IMAGE_KHR) {
     return nullptr;
   }
-
+  AHardwareBuffer_Desc desc;
+  HardwareBufferInterface::Describe(hardwareBuffer, &desc);
   auto sampler = std::make_unique<GLSampler>();
   sampler->target = GL_TEXTURE_2D;
-  sampler->format = PixelFormat::RGBA_8888;
+  sampler->format =
+      desc.format == HARDWAREBUFFER_FORMAT_R8_UNORM ? PixelFormat::ALPHA_8 : PixelFormat::RGBA_8888;
   glGenTextures(1, &sampler->id);
   if (sampler->id == 0) {
     eglext::eglDestroyImageKHR(display, eglImage);
@@ -89,8 +91,6 @@ std::shared_ptr<EGLHardwareTexture> EGLHardwareTexture::MakeFrom(Context* contex
   glTexParameteri(sampler->target, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(sampler->target, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   eglext::glEGLImageTargetTexture2DOES(sampler->target, (GLeglImageOES)eglImage);
-  AHardwareBuffer_Desc desc;
-  HardwareBufferInterface::Describe(hardwareBuffer, &desc);
   glTexture = Resource::Wrap(
       context, new EGLHardwareTexture(hardwareBuffer, eglImage, desc.width, desc.height));
   glTexture->sampler = std::move(sampler);

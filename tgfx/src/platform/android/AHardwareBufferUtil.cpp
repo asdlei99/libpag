@@ -20,8 +20,6 @@
 #include "HardwareBufferInterface.h"
 
 namespace tgfx {
-static constexpr int HARDWAREBUFFER_FORMAT_R8_UNORM = 0x38;
-
 ImageInfo GetImageInfo(AHardwareBuffer* hardwareBuffer) {
   AHardwareBuffer_Desc desc;
   HardwareBufferInterface::Describe(hardwareBuffer, &desc);

@@ -39,6 +39,7 @@ class AHardwareBufferFunctions {
   jobject (*AHB_to_HB)(JNIEnv*, AHardwareBuffer*) = nullptr;
   AHardwareBuffer* (*AHB_from_HB)(JNIEnv*, jobject) = nullptr;
   int (*AHB_from_Bitmap)(JNIEnv*, jobject, AHardwareBuffer**) = nullptr;
+  bool hasR8Format = false;
 
   AHardwareBufferFunctions() {
     char sdk[PROP_VALUE_MAX] = "0";
@@ -57,6 +58,7 @@ class AHardwareBufferFunctions {
     if (version >= 30) {
       LoadSymbol(AHB_from_Bitmap, "AndroidBitmap_getHardwareBuffer");
     }
+    hasR8Format = version > 33;
   }
 };
 
@@ -72,6 +74,10 @@ bool HardwareBufferInterface::Available() {
       GetFunctions()->describe != nullptr && GetFunctions()->acquire != nullptr &&
       GetFunctions()->AHB_to_HB != nullptr && GetFunctions()->AHB_from_HB != nullptr;
   return available;
+}
+
+bool HardwareBufferInterface::HasR8Format() {
+  return GetFunctions()->hasR8Format;
 }
 
 int HardwareBufferInterface::Allocate(const AHardwareBuffer_Desc* desc,

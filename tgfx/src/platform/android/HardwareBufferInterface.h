@@ -22,6 +22,8 @@
 #include <jni.h>
 
 namespace tgfx {
+static constexpr uint32_t HARDWAREBUFFER_FORMAT_R8_UNORM = 0x38;
+
 /**
  * This utility class allows us to use AHardwareBuffer interfaces without compiling for API 26
  * (Oreo) and above.
@@ -32,6 +34,11 @@ class HardwareBufferInterface {
    * Returns true if the local system has AHardwareBuffer support.
    */
   static bool Available();
+
+  /**
+   * Returns true if there is support for AHARDWAREBUFFER_FORMAT_R8_UNORM.
+   */
+  static bool HasR8Format();
 
   /**
    * Allocates a buffer that backs an AHardwareBuffer using the passed AHardwareBuffer_Desc.
